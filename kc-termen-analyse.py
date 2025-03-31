@@ -318,6 +318,23 @@ unique_term_categorie = df_termen_vs_broader.groupby('main_term')['term_type_val
 df_termen_vs_broader['meerdere_categorien_main_term'] = df_termen_vs_broader['main_term'].map(unique_term_categorie).gt(1).map({True:'ja', False: 'nee'})
 
 #----
+categorie_per_main = (
+    df_termen_vs_broader
+    .groupby('main_term')['term_type_option']
+    .agg(lambda x: ', '.join(sorted(set(str(v) for v in x if pd.notna(v) and str(v).strip() != ''))))
+    .to_dict()
+)
+
+def meerdere_categorien(term):
+    cat_list = categorie_per_main.get(term, '')
+    if ',' in cat_list:
+        return cat_list
+    else:
+        return ''
+
+df_termen_vs_broader['uitwerking_meerdere_categorien_voor_main'] = df_termen_vs_broader['main_term'].map(meerdere_categorien)
+
+#-----
 main_term_list = df_termen_vs_broader['main_term'].dropna().unique()
 main_term_map, main_term_dict = build_fuzzy_index(main_term_list)
 
