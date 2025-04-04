@@ -14,6 +14,49 @@ kc_all = 'data/KC_Thesaurus_all_2025-03-21.xml'
 kc_collect = 'data/KC_Thesaurus_collect_2025-03-21.xml'
 
 # ---------------check structuur xml----------------------
+# SAX alle paden naar een csv
+
+class PathCollector(xml.sax.ContentHandler):
+    def __init__(self):
+        self.current_path = []
+        self.paths = set()
+
+    def startElement(self, name, attrs):
+        self.current_path.append(name)
+        full_path = "/" + "/".join(self.current_path)
+        self.paths.add(full_path)
+
+    def endElement(self, name):
+        self.current_path.pop()
+
+def extract_paths_from_xml(file_path):
+    handler = PathCollector()
+    parser = xml.sax.make_parser()
+    parser.setContentHandler(handler)
+    parser.parse(file_path)
+    return sorted(handler.paths)
+
+def export_paths_to_csv(paths, output_csv):
+    with open(output_csv, mode='w', newline='', encoding='utf-8') as f:
+        writer = csv.writer(f)
+        writer.writerow(['xml_path'])
+        for path in paths:
+            writer.writerow([path])
+
+if __name__ == "__main__":
+    xml_file = "data/KC_Thesaurus_all_2025-03-21.xml"
+    output_csv = "xml_paths.csv"
+
+    paths = extract_paths_from_xml(xml_file)
+    export_paths_to_csv(paths, output_csv)
+
+    print(f"{len(paths)} paths exported to {output_csv}")
+
+
+
+#---------
+
+
 def collect_structure(elem, path="", structure=None):
     if structure is None:
         structure = defaultdict(set)
@@ -181,7 +224,7 @@ final_columns = [
 
 # Select only columns that exist in the DataFrame
 df = df[[col for col in final_columns if col in df.columns]]
-
+# df.to_csv("kc_export.csv", index=False)
 #------------------------------------------------------------------------
 
 # # Filter data
@@ -217,7 +260,9 @@ df = df[[col for col in final_columns if col in df.columns]]
 #  'used_for_term'] # altLabel main term
 
 #-------------------------------------------------------------
-
+# import pandas as pd
+# df = pd.read_csv("kc_export.csv")
+#----
 
 def bevat_cijfer_teken_of_1letter(term):
     if pd.isna(term):
