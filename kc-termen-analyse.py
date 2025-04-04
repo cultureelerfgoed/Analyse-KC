@@ -200,7 +200,7 @@ def process_record(record: etree._Element) -> List[Dict]:
 
 def xml_to_dataframe(file_path: str) -> pd.DataFrame:
     """
-    Parse the XML file and convert it to a pandas DataFrame with all attributes.
+    Parse the XML file and convert it to a pandas DataFrame with all attributes. Note that this is not ALL attributes, but the ones I chose to parse.
     """
     tree = etree.parse(file_path)
     records = tree.xpath('//record')
