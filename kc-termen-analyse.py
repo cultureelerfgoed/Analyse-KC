@@ -6,6 +6,8 @@ import re
 import xml.etree.ElementTree as ET
 from collections import defaultdict
 from rapidfuzz.fuzz import ratio
+import xml.sax
+import csv
 
 file_path = 'data/KC_Thesaurus_all_2025-03-21.xml'
 
